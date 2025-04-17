@@ -19,6 +19,9 @@ import { deleteEmployee } from '../service/empservice'; // Assuming a delete API
 import DeleteDialog from './DeleteDialog'; // Import the DeleteDialog component
 import SearchBar from '../components/searchbar'; // Import the SearchBar component
 import PaginationControls from './PaginationControls'; // Import the PaginationControls component
+import ConvertPDF from '../components/convertPDF'; // Import the ExportCSV component
+import ExportCSV from '../components/exportCSV';
+
 
 interface Employee {
   id: number;
@@ -146,6 +149,14 @@ const ListEmp: React.FC<ListEmpProps> = ({ employees, onLogout, onDelete }) => {
 
       {/* Delete Confirmation Dialog */}
       <DeleteDialog open={open} onClose={handleCloseDialog} />
+
+{/* Export PDF Button */}
+<ConvertPDF employees={employees} />
+
+{/* Export CSV Button */}
+<ExportCSV employees={employees} />
+
+
     </div>
   );
 };

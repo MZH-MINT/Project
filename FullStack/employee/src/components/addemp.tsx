@@ -20,7 +20,7 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({ onEmployeeAdded }) => {
 
     try {
       const employees = await getAllEmployees();
-      const emailExists = employees.some((emp) => emp.email === email);
+      const emailExists = employees.some((emp: { email: string; }) => emp.email === email);
 
       if (emailExists) {
         alert('An employee with this email already exists.');

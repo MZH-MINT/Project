@@ -9,7 +9,7 @@ interface SearchBarProps {
 const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, setSearchQuery }) => {
   return (
     <TextField
-      label="Search"
+      label="Search By Employee"
       variant="outlined"
       size="small"
       value={searchQuery}

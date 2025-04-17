@@ -38,7 +38,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
       <Pagination
         count={Math.ceil(totalItems / rowsPerPage)}
         page={currentPage}
-        onChange={(event, value) => setCurrentPage(value)}
+        onChange={(_event, value) => setCurrentPage(value)}
         color="primary"
       />
     </div>

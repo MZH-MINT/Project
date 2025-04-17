@@ -19,7 +19,7 @@ interface Employee {
 const App: React.FC = () => {
   const [employees, setEmployees] = React.useState<Employee[]>([]);
   const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false);
-  const [token, setToken] = React.useState<string>('');
+  const [, setToken] = React.useState<string>('');
 
   const fetchEmployees = async () => {
     try {
