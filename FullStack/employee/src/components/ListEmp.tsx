@@ -11,15 +11,14 @@ import {
   IconButton,
   Tooltip,
   Button,
-  Dialog,
-  DialogActions,
-  DialogTitle,
-  DialogContent,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import { deleteEmployee } from '../service/empservice'; // Assuming a delete API function
+import DeleteDialog from './DeleteDialog'; // Import the DeleteDialog component
+import SearchBar from '../components/searchbar'; // Import the SearchBar component
+import PaginationControls from './PaginationControls'; // Import the PaginationControls component
 
 interface Employee {
   id: number;
@@ -31,53 +30,66 @@ interface Employee {
 
 interface ListEmpProps {
   employees: Employee[];
-// Ensure onAdd prop is passed for adding employee
+  onLogout: () => void;
+  onDelete: () => void;
 }
 
-const ListEmp: React.FC<ListEmpProps> = ({ employees }) => {
-  const [open, setOpen] = useState(false); // For the confirmation dialog
-  const [employeeToDelete, setEmployeeToDelete] = useState<number | null>(null); // Store employee id to delete
+const ListEmp: React.FC<ListEmpProps> = ({ employees, onLogout, onDelete }) => {
+  const [open, setOpen] = useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
   const navigator = useNavigate();
 
   const handleDeleteClick = (id: number) => {
-    setEmployeeToDelete(id); // Set the employee to delete
-    setOpen(true); // Open the confirmation dialog
+    setEmployeeToDelete(id);
+    setOpen(true);
   };
 
   const handleCloseDialog = (confirm: boolean) => {
-    setOpen(false); // Close the dialog
-
+    setOpen(false);
     if (confirm && employeeToDelete !== null) {
-      // If confirmed, call delete API
       deleteEmployee(employeeToDelete)
         .then(() => {
           alert('Employee deleted successfully');
-          // Reload the list of employees or refresh the state (You can trigger the parent method here)
-          // onDelete(employeeToDelete); 
+          onDelete();
         })
         .catch((error) => {
           console.error('Error deleting employee:', error);
-          alert('Failed to delete employee.');
         });
     }
-    setEmployeeToDelete(null); // Clear the employee ID after the action
+    setEmployeeToDelete(null);
   };
+
+  const filteredEmployees = employees.filter((emp) =>
+    `${emp.firstName} ${emp.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const paginatedEmployees = filteredEmployees.slice(startIndex, startIndex + rowsPerPage);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="flex justify-between mb-4">
-        <Typography variant="h4" align="center" gutterBottom className="text-indigo-700 font-bold">
+      <div className="flex justify-between mb-4 gap-4">
+        <Typography variant="h4" className="text-indigo-700 font-bold">
           Employee List
         </Typography>
-        {/* Add Employee button */}
-        <Button variant="contained" color="primary" onClick={() => navigator('/add')}>
-          Add Employee
-        </Button>
+        <div className="flex gap-2 items-center ml-auto">
+          <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          <Button variant="contained" color="primary" onClick={() => navigator('/add')}>
+            Add Employee
+          </Button>
+          <Button variant="outlined" color="secondary" onClick={onLogout}>
+            Logout
+          </Button>
+        </div>
       </div>
 
       <TableContainer component={Paper} elevation={4} className="rounded-xl shadow-lg">
         <Table>
-          <TableHead sx={{ backgroundColor: '#EEF2FF' }}>
+          <TableHead>
             <TableRow>
               <TableCell><strong>ID</strong></TableCell>
               <TableCell><strong>First Name</strong></TableCell>
@@ -88,8 +100,8 @@ const ListEmp: React.FC<ListEmpProps> = ({ employees }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {employees.length > 0 ? (
-              employees.map((emp) => (
+            {paginatedEmployees.length > 0 ? (
+              paginatedEmployees.map((emp) => (
                 <TableRow key={emp.id} hover>
                   <TableCell>{emp.id}</TableCell>
                   <TableCell>{emp.firstName}</TableCell>
@@ -97,7 +109,6 @@ const ListEmp: React.FC<ListEmpProps> = ({ employees }) => {
                   <TableCell>{emp.email}</TableCell>
                   <TableCell>{emp.position}</TableCell>
                   <TableCell>
-                    {/* Action buttons */}
                     <Tooltip title="Edit">
                       <IconButton color="primary" onClick={() => navigator(`/edit/${emp.id}`)}>
                         <EditIcon />
@@ -124,21 +135,17 @@ const ListEmp: React.FC<ListEmpProps> = ({ employees }) => {
         </Table>
       </TableContainer>
 
+      {/* Pagination Controls */}
+      <PaginationControls
+        rowsPerPage={rowsPerPage}
+        setRowsPerPage={setRowsPerPage}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        totalItems={filteredEmployees.length}
+      />
+
       {/* Delete Confirmation Dialog */}
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Confirm Deletion</DialogTitle>
-        <DialogContent>
-          <Typography>Are you sure you want to delete this employee?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => handleCloseDialog(false)} color="primary">
-            No
-          </Button>
-          <Button onClick={() => handleCloseDialog(true)} color="secondary">
-            Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DeleteDialog open={open} onClose={handleCloseDialog} />
     </div>
   );
 };

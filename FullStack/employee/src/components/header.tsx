@@ -1,12 +1,13 @@
 import React from 'react';
-
+import '../style/header.css'; // Import the external CSS file
 
 const Header: React.FC = () => {
   return (
-    <header className="bg-indigo-600 text-white shadow-md">
-      <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Employee Managing system by zuhayr</h1>
-        <nav className="space-x-4">
+    <header className="header-container">
+      <div className="header-content">
+        <h1 className="header-title">Employee Managing System by Zuhayr</h1>
+        <nav className="header-nav">
+          {/* Add navigation links here if needed */}
         </nav>
       </div>
     </header>

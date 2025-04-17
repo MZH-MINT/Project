@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Paper } from '@mui/material';
+import { TextField, Button, Typography, Paper, MenuItem } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { addEmployee } from '../service/empservice';
+import { addEmployee, getAllEmployees } from '../service/empservice';
 
 interface AddEmployeeProps {
   onEmployeeAdded: () => void;
@@ -19,10 +19,18 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({ onEmployeeAdded }) => {
     e.preventDefault();
 
     try {
+      const employees = await getAllEmployees();
+      const emailExists = employees.some((emp) => emp.email === email);
+
+      if (emailExists) {
+        alert('An employee with this email already exists.');
+        return;
+      }
+
       const newEmp = { firstName, lastName, email, position };
       await addEmployee(newEmp);
-      onEmployeeAdded();       // ✅ Call parent to refresh list
-      navigate('/');           // ✅ Navigate back to list
+      onEmployeeAdded();
+      navigate('/');
     } catch (error) {
       console.error('Failed to add employee:', error);
       alert('Error adding employee. Please try again.');
@@ -62,13 +70,20 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({ onEmployeeAdded }) => {
           required
         />
         <TextField
+          select
           label="Position"
           value={position}
           onChange={(e) => setPosition(e.target.value)}
           fullWidth
           margin="normal"
           required
-        />
+        >
+          {['Trainee', 'SWE1', 'SWE2', 'SWE3', 'SDM', 'PM'].map((pos) => (
+            <MenuItem key={pos} value={pos}>
+              {pos}
+            </MenuItem>
+          ))}
+        </TextField>
 
         <Button type="submit" variant="contained" color="primary" fullWidth className="mt-4">
           Add Employee
