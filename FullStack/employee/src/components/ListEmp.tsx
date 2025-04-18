@@ -20,7 +20,7 @@ import DeleteDialog from './DeleteDialog'; // Import the DeleteDialog component
 import SearchBar from '../components/searchbar'; // Import the SearchBar component
 import PaginationControls from './PaginationControls'; // Import the PaginationControls component
 import ConvertPDF from '../components/convertPDF'; // Import the ExportCSV component
-import ExportCSV from '../components/exportCSV';
+import ExportCSV from '../components/exportcsv';
 
 
 interface Employee {
