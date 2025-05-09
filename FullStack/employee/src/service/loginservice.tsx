@@ -15,7 +15,7 @@ interface LoginResponse {
 export const loginUser = async (loginRequest: LoginRequest): Promise<LoginResponse> => {
   try {
     const response = await axios.post(API_URL, loginRequest);
-    return response.data; // Assuming the response is in the structure { message, token }
+    return response.data; 
   } catch (error) {
     if (axios.isAxiosError(error)) {
       // Handle Axios errors
